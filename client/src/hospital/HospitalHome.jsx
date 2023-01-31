@@ -8,15 +8,17 @@ import {
   Button,
   Table,
   Modal,
+  Col,
+  Row,
 } from "react-bootstrap";
 import Layout from "../component/Layout";
-import { ReactComponent as Add } from "../../svg/add.svg";
-import { ReactComponent as Next } from "../../svg/next.svg";
-import { ReactComponent as Prev } from "../../svg/prev.svg";
+import { ReactComponent as Add } from "../resource/add.svg";
+import { ReactComponent as Next } from "../resource/next.svg";
+import { ReactComponent as Prev } from "../resource/prev.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Home() {
+export default function Hospital() {
   const Array = [
     {
       Name: "Ram",
@@ -81,22 +83,23 @@ export default function Home() {
   };
 
   const handleNextClick = () => {
-    if(medEmrgType != "") {
-        navigate("/hospital/new_report", {
-            state: {
-              medCase: medCaseType,
-              emrgCase: medEmrgType,
-            },
-          });
+    if (medEmrgType != "") {
+      navigate("/hospital/new_report", {
+        state: {
+          medCase: medCaseType,
+          emrgCase: medEmrgType,
+        },
+      });
     }
   };
 
   return (
     <div>
-      <Layout heading={"Hospital Name"} />
+      <Layout heading="Hospital Name" appBarColor="primary" />
+      <div style={{height:"50px"}} />
       <Container className="my-5">
-        <div className="d-flex justify-content-between">
-          <div className="d-flex">
+        <Row>
+          <Col sm="3" className="mb-3">
             <Form.Select
               className="me-3"
               required
@@ -109,20 +112,22 @@ export default function Home() {
               <option value="Phone">Phone No.</option>
               <option value="Type">Type</option>
             </Form.Select>
-
+          </Col>
+          <Col sm="6" className="mb-3">
             <Form.Control
-              style={{ width: "500px" }}
               placeholder="Search here...."
               onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
+          </Col>
 
-          <Button className="ms-5 " onClick={() => setModal1Show(true)}>
-            New <Add />
-          </Button>
-        </div>
+          <Col sm="3" className="d-flex justify-content-end">
+            <Button style={{height:"40px"}} className="ms-5 " onClick={() => setModal1Show(true)}>
+             <div  style={{width:'60px'}}>New <Add /></div> 
+            </Button>
+          </Col>
+        </Row>
 
-        <Table className="mt-5" striped bordered hover>
+        <Table className="mt-5" striped bordered hover responsive="sm" center>
           <thead>
             <tr>
               <th>S.No</th>
@@ -137,7 +142,7 @@ export default function Home() {
             {Array.filter((arr) => arr[serachBy].includes(search)).map(
               (arr, i) => {
                 return (
-                  <tr>
+                  <tr onClick={() => navigate(`/hospital/view_report/${i+1}`)}>
                     <td>{i + 1}</td>
                     <td>{arr.Name}</td>
                     <td>{arr.Gender}</td>
@@ -191,14 +196,6 @@ export default function Home() {
                   onChange={(e) => setMedCaseType(e.target.value)}
                 />
                 <div style={{ height: "10px" }} />
-                <Form.Check
-                  inline
-                  label="Assualt"
-                  value="Assualt"
-                  name="type"
-                  type="radio"
-                  onChange={(e) => setMedCaseType(e.target.value)}
-                />
               </div>
               <div style={{ width: "10px" }} />
               <div className="d-flex flex-column">
@@ -213,8 +210,8 @@ export default function Home() {
                 <div style={{ height: "10px" }} />
                 <Form.Check
                   inline
-                  label="Dying decleration"
-                  value="Dying decleration"
+                  label="Assualt"
+                  value="Assualt"
                   name="type"
                   type="radio"
                   onChange={(e) => setMedCaseType(e.target.value)}
