@@ -385,6 +385,7 @@ export default function ViewReportHos() {
         
         <div style={{ height: "20px" }} />
 
+        <div className="d-flex justify-content-between" style={{width: '100%'}} >
         <Button
           variant="primary"
           className="me-3"
@@ -393,6 +394,16 @@ export default function ViewReportHos() {
         >
           Back
         </Button>
+
+        <Button
+        variant="success"
+          className="me-3"
+          style={{ width: "80px" }}
+          onClick={() => navigate("/police")}
+        >
+          Arrived
+        </Button>
+        </div>
 
         <div style={{ height: "50px" }} />
       </Container>

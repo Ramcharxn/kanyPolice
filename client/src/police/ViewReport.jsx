@@ -385,6 +385,7 @@ export default function ViewReport() {
         
         <div style={{ height: "20px" }} />
 
+        <div className="d-flex justify-content-between" style={{width: '100%'}} >
         <Button
           variant="danger"
           className="me-3"
@@ -394,6 +395,15 @@ export default function ViewReport() {
           Back
         </Button>
 
+        <Button
+          variant="success"
+          className="me-3"
+          style={{ width: "140px" }}
+          onClick={() => navigate("/police")}
+        >
+          Case Close
+        </Button>
+        </div>
         <div style={{ height: "50px" }} />
       </Container>
     </>

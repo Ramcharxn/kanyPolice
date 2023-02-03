@@ -25,13 +25,15 @@ export default function Police() {
       Gender: "Male",
       Severity: "Moderate",
       Type: "Accident",
+      Status: "Acknowledged",
       Phone: "6382944040",
     },
     {
       Name: "Achintya",
       Gender: "Female",
-      Severity: "Normal",
+      Severity: "Critical",
       Type: "Poison",
+      Status: "Closed",
       Phone: "999444000",
     },
     {
@@ -39,13 +41,15 @@ export default function Police() {
       Gender: "Male",
       Severity: "Normal",
       Type: "Accident",
+      Status: "Intimated",
       Phone: "66677778888",
     },
     {
       Name: "Mahidhar",
       Gender: "Male",
-      Severity: "Moderate",
+      Severity: "Dead",
       Type: "Assualt",
+      Status: "Arrived",
       Phone: "11122255576",
     },
   ];
@@ -85,8 +89,72 @@ export default function Police() {
     audio.pause();
   }
 
-  const senSMS = () => {
+  function circleColor (Severity) {
+    switch (Severity) {
+      case "Normal":
+        return (
+          <div
+            style={{
+              backgroundColor: "green",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      case "Moderate":
+        return (
+          <div
+            style={{
+              backgroundColor: "yellow",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      case "Critical":
+        return (
+          <div
+            style={{
+              backgroundColor: "red",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+        case "Dead":
+        return (
+          <div
+            style={{
+              backgroundColor: "black",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      default:
+        return null;
+    }
+  }
 
+  const policeSTatus = (status) => {
+    switch (status) {
+      case "Viewed":
+        return "Viewed"
+      case "Arrived":
+        return "Arrived"
+      case "Closed":
+        return "Closed"
+      default:
+        return "Intimated"
+    }
   }
 
   return (
@@ -105,7 +173,7 @@ export default function Police() {
             >
               <option value="Name">Name</option>
               <option value="Severity">Severity</option>
-              <option value="Phone">Phone No.</option>
+              <option value="Status">Status</option>
               <option value="Type">Type</option>
             </Form.Select>
           </Col>
@@ -113,7 +181,7 @@ export default function Police() {
             <Form.Control
             className="form-focus"
               placeholder="Search here...."
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value.toLowerCase())}
             />
           </Col>
           <Col sm="3" className="d-flex justify-content-end">
@@ -147,26 +215,32 @@ export default function Police() {
 
         <Table className="mt-5" striped bordered hover responsive="sm" center>
           <thead>
-            <tr>
+            <tr style={{backgroundColor:"#d7d7d7"}}>
+              <th></th>
               <th>S.No</th>
               <th>Patient Name</th>
               <th>Gender</th>
               <th>Phone No.</th>
-              <th>Severity</th>
               <th>Type</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {Array.filter((arr) => arr[serachBy].includes(search)).map(
+            {Array.filter((arr) => arr[serachBy].toLowerCase().includes(search)).map(
               (arr, i) => {
                 return (
                   <tr key={i} onClick={() => navigate(`/police/view_report/${i+1}`)}>
+                    <td>
+                      {circleColor(arr.Severity)}
+                    </td>
                     <td>{i + 1}</td>
+
                     <td>{arr.Name}</td>
                     <td>{arr.Gender}</td>
                     <td>{arr.Phone}</td>
-                    <td>{arr.Severity}</td>
                     <td>{arr.Type}</td>
+                    {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
+                    <td>{policeSTatus(arr.Status)}</td>
                   </tr>
                 );
               }

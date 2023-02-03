@@ -8,10 +8,10 @@ export default function NewReport() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  var medCase = location.state.medCase;
-  var emrgCase = location.state.emrgCase;
+  // var medCase = location.state.medCase;
+  // var emrgCase = location.state.emrgCase;
 
-  var headingText = medCase + " " + emrgCase;
+  // var headingText = medCase + " " + emrgCase;
 
   const [state, setState] = useState({
     Sex: "Male",
@@ -19,6 +19,7 @@ export default function NewReport() {
     Dying_declaration: "Dying Declaration Not required",
     Police_Info: "Police Information Given",
     Consciousness: "Conscious",
+    Type_of_Medico_legal_case: "Accident"
   });
 
   const [ARPhoto, setARPhoto] = useState() 
@@ -116,20 +117,20 @@ export default function NewReport() {
     console.log(ARPhoto)
     console.log(IPPhoto)
 
-    if(medCase == "Emergency") {
+    // if(medCase == "Emergency") {
       toast.success('Alerted respective control room')
       toast.success('Alerted the nearest police station')
       toast.success('Alerted SP viva SMS')
-    } else {
-      toast.success('Alerted the nearest police station')
-    }
+    // } else {
+      // toast.success('Alerted the nearest police station')
+    // }
 
     navigate('/hospital')
   }
 
   return (
     <>
-      <Layout heading={emrgCase == "" ? medCase : headingText} appBarColor="primary" />
+      <Layout heading="New Report" appBarColor="primary" />
       <div style={{height:"50px"}} />
       <Container className="mt-5">
         <div className="mb-3" style={{ fontSize: "22px" }}>
@@ -267,7 +268,7 @@ export default function NewReport() {
                 onChange={updateInput}
               />
             </Col>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="3">
               <Form.Select
                 aria-label="Default select example"
                 name="Dying_declaration"
@@ -281,9 +282,7 @@ export default function NewReport() {
                 </option>
               </Form.Select>
             </Col>
-          </Row>
-          <Row>
-            <Col className="mb-3" sm="4">
+            <Col className="mb-3" sm="3">
               <Form.Select
                 aria-label="Default select example"
                 name="Police_Info"
@@ -294,6 +293,25 @@ export default function NewReport() {
                 </option>
                 <option value="Police Information Not given">
                   Police Information Not given
+                </option>
+              </Form.Select>
+            </Col>
+          </Row>
+          <Row>
+          <Col className="mb-3" sm="3">
+              <Form.Select
+                aria-label="Default select example"
+                name="Type_of_Medico_legal_case"
+                onChange={updateInput}
+              >
+              <option value="Accident">
+                Accident
+              </option>
+                <option value="Poison">
+                  Poison
+                </option>
+                <option value="Assault">
+                  Assault
                 </option>
               </Form.Select>
             </Col>

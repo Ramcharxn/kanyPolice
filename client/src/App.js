@@ -7,6 +7,7 @@ import ViewReport from './police/ViewReport';
 import Login from './component/Login';
 import Police from './police/PoliceHome';
 import ViewReportHos from './hospital/ViewReportHos';
+import SignUp from './component/SignUp';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         <Route path='/' element={<Login />}></Route>
+        <Route path='/signup' element={<SignUp />}></Route>
 
         <Route path='/hospital' element={<Hospital />}></Route>
         <Route path='/hospital/new_report' element={<NewReport />}></Route>
