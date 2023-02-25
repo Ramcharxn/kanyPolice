@@ -5,16 +5,40 @@ import { Container, Form, Row, Col, Button } from "react-bootstrap";
 import toast from "react-hot-toast";
 import '../App.css'
 import { BrowserView, MobileView, isBrowser } from 'react-device-detect';
-import pic from '../report.jpeg'
+import pic from '../resource/report.jpeg'
+import BGImage from "../component/BGImage";
+import { collection, doc, setDoc } from "firebase/firestore";
+import db from '../firebase'
 
 export default function ViewReportHos() {
+  const location = useLocation();
+
   const navigate = useNavigate();
+  const patientsRef = collection(db, "patients");
 
   const styleDic = isBrowser ? { fontSize: "18px", color: "blue" } : { fontSize: "14px", color: "white" };
 
   const bottomBar = isBrowser ? "" : " bottom-bar"
 
   const [design, setDesign] = useState("patient_detials");
+
+  var record = location.state.rec
+
+  const handleStatus = async() => 
+  {
+    try {
+      
+      const patientsRef = doc(db, "patients", record.id);
+      await setDoc(patientsRef, { status: 'Arrived' }, { merge: true });
+
+    console.log('done')
+    } catch (err) {
+      console.log(err)
+      toast.error('An error occured, if this error presist try again later')
+    }
+    navigate("/hospital")
+  }
+
   return (
     <>
       <Layout heading="Report severity" appBarColor="primary" />
@@ -54,10 +78,19 @@ export default function ViewReportHos() {
         </div>
         <Form.Group>
           <Row>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="3">
               <Form.Control
                 placeholder="Patient Name"
                 name="Patient Name"
+                type="text"
+                disabled
+                value=""
+              />
+            </Col>
+            <Col className="mb-3" sm="3">
+              <Form.Control
+                placeholder="Phone number"
+                name="Phone number"
                 type="text"
                 disabled
                 value=""
@@ -178,15 +211,24 @@ export default function ViewReportHos() {
               <Form.Control
                 placeholder="Hospital No."
                 name="Hospital No."
-                type="number"
+                type="text"
                 disabled
                 value=""
               />
             </Col>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="3">
               <Form.Control
                 placeholder="Dying_declaration"
                 name="Dying_declaration"
+                type="text"
+                disabled
+                value=""
+              />
+            </Col>
+            <Col className="mb-3" sm="3">
+              <Form.Control
+                placeholder="Police_Info"
+                name="Police_Info"
                 type="number"
                 disabled
                 value=""
@@ -315,7 +357,7 @@ export default function ViewReportHos() {
             </Col>
           </Row>
           <Row>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="4">
               <Form.Control
                 placeholder="Police station limit"
                 name="Police station limit"
@@ -325,10 +367,19 @@ export default function ViewReportHos() {
               />
             </Col>
 
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="4">
               <Form.Control
                 placeholder="Admitted Doctor Name"
                 name="Admitted by Doctor Name"
+                type="text"
+                disabled
+                value=""
+              />
+            </Col>
+            <Col className="mb-3" sm="4">
+              <Form.Control
+                placeholder="Severity"
+                name="Severity"
                 type="text"
                 disabled
                 value=""
@@ -399,7 +450,7 @@ export default function ViewReportHos() {
         variant="success"
           className="me-3"
           style={{ width: "80px" }}
-          onClick={() => navigate("/police")}
+          onClick={handleStatus}
         >
           Arrived
         </Button>

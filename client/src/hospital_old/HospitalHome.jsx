@@ -18,51 +18,56 @@ import { ReactComponent as Prev } from "../resource/prev.svg";
 import { ReactComponent as CheckBox } from "../resource/checkbox.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BGImage from "../component/BGImage";
+import { onSnapshot, collection, collectionGroup } from "firebase/firestore";
+import db from "../firebase";
 
 export default function Hospital() {
   const Array = [
     {
-      Name: "Ram",
-      Gender: "Male",
-      Severity: "Moderate",
-      Type: "Accident",
-      Status: "Acknowledged",
-      Phone: "6382944040",
-    },
-    {
-      Name: "Achintya",
-      Gender: "Female",
+      "Patient Name": "Achintya",
+      Sex: "Female",
       Severity: "Critical",
-      Type: "Poison",
-      Status: "Closed",
-      Phone: "999444000",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "999444000",
     },
     {
-      Name: "Selva",
-      Gender: "Male",
+      "Patient Name": "Selva",
+      Sex: "Male",
       Severity: "Normal",
-      Type: "Accident",
-      Status: "Intimated",
-      Phone: "66677778888",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "66677778888",
     },
     {
-      Name: "Mahidhar",
-      Gender: "Male",
+      "Patient Name": "Mahidhar",
+      Sex: "Male",
       Severity: "Dead",
-      Type: "Assualt",
-      Status: "Arrived",
-      Phone: "11122255576",
+      Type_of_Medico_legal_case: "Assualt",
+      status: "Arrived",
+      "Phone number": "11122255576",
+    },{
+      "Patient Name": "Ram",
+      Sex: "Male",
+      Severity: "Moderate",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Acknowledged",
+      "Phone number": "6382944040",
     },
   ];
+
+  const patientsRef = collection(db, "patients");
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const [serachBy, setSearchBy] = useState("Name");
+  const [serachBy, setSearchBy] = useState("Patient Name");
   const [modal1Show, setModal1Show] = useState(false);
   const [modal2Show, setModal2Show] = useState(false);
   const [medCaseType, setMedCaseType] = useState("");
   const [medEmrgType, setMedEmrgType] = useState("");
+  const [record, setRecord] = useState([]);
 
   const handleClick = () => {
     if (medCaseType == "Emergency") {
@@ -98,6 +103,17 @@ export default function Hospital() {
     }
   };
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(patientsRef, (snapshot) => {
+      setRecord(snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })));
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   function getRowColor(severity) {
     switch (severity) {
       case "Critical":
@@ -111,7 +127,7 @@ export default function Hospital() {
     }
   }
 
-  function circleColor (Severity) {
+  function circleColor(Severity) {
     switch (Severity) {
       case "Normal":
         return (
@@ -149,7 +165,7 @@ export default function Hospital() {
             }}
           />
         );
-        case "Dead":
+      case "Dead":
         return (
           <div
             style={{
@@ -166,21 +182,9 @@ export default function Hospital() {
     }
   }
 
-  const policeSTatus = (status) => {
-    switch (status) {
-      case "Viewed":
-        return "Viewed"
-      case "Arrived":
-        return "Arrived"
-      case "Closed":
-        return "Closed"
-      default:
-        return "Intimated"
-    }
-  }
-
   return (
     <div>
+      <BGImage />
       <Layout heading="Hospital Name" appBarColor="primary" />
       <div style={{ height: "50px" }} />
       <Container className="my-5">
@@ -193,10 +197,10 @@ export default function Hospital() {
               name="sex"
               onChange={(e) => setSearchBy(e.target.value)}
             >
-              <option value="Name">Name</option>
+              <option value="Patient Name">Patient Name</option>
               <option value="Severity">Severity</option>
-              <option value="Status">Status</option>
-              <option value="Type">Type</option>
+              <option value="status">Status</option>
+              <option value="Type_of_Medico_legal_case">Type</option>
             </Form.Select>
           </Col>
           <Col sm="6" className="mb-3">
@@ -211,7 +215,7 @@ export default function Hospital() {
               style={{ height: "40px" }}
               className="ms-5 "
               onClick={() => navigate("/hospital/new_report")}
-          >
+            >
               <div style={{ width: "60px" }}>
                 New <Add />
               </div>
@@ -221,7 +225,7 @@ export default function Hospital() {
 
         <Table className="mt-5" bordered hover responsive="sm" center>
           <thead>
-            <tr style={{backgroundColor:"#d7d7d7"}}>
+            <tr style={{ backgroundColor: "#d7d7d7" }}>
               <th></th>
               <th>S.No</th>
               <th>Patient Name</th>
@@ -231,25 +235,54 @@ export default function Hospital() {
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            {Array.filter((arr) => arr[serachBy].toLowerCase().includes(search)).map(
+          <tbody style={{height:'10px'}}>
+            {record.length > 0
+              ? record
+                  .filter((arr) =>
+                    arr[serachBy].toLowerCase().includes(search)
+                  )
+                  .map((arr, i) => {
+                    console.log(record)
+                    return (
+                      <tr
+                        // style={{ backgroundColor: getRowColor(arr.Severity) }}
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate(`/hospital/view_report/${arr.id}`, {
+                            state: {
+                              rec: arr,
+                            },
+                        })}
+                      >
+                        <td>{circleColor(arr.Severity)}</td>
+                        <td>{i + 1}</td>
+
+                        <td>{arr["Patient Name"]}</td>
+                        <td>{arr.Sex}</td>
+                        <td>{arr["Phone number"]}</td>
+                        <td>{arr.Type_of_Medico_legal_case}</td>
+                        {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
+                        <td>{arr.status}</td>
+                      </tr>
+                    );
+                  })
+              : null}
+              {Array.filter((arr) => arr[serachBy].toLowerCase().includes(search)).map(
               (arr, i) => {
                 return (
                   <tr
                     // style={{ backgroundColor: getRowColor(arr.Severity) }}
                     onClick={() => navigate(`/hospital/view_report/${i + 1}`)}
                   >
-                    <td>
-                      {circleColor(arr.Severity)}
-                    </td>
-                    <td>{i + 1}</td>
+                    <td>{circleColor(arr.Severity)}</td>
+                        <td>{i + 2}</td>
 
-                    <td>{arr.Name}</td>
-                    <td>{arr.Gender}</td>
-                    <td>{arr.Phone}</td>
-                    <td>{arr.Type}</td>
-                    {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
-                    <td>{policeSTatus(arr.Status)}</td>
+                        <td>{arr["Patient Name"]}</td>
+                        <td>{arr.Sex}</td>
+                        <td>{arr["Phone number"]}</td>
+                        <td>{arr.Type_of_Medico_legal_case}</td>
+                        {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
+                        <td>{arr.status}</td>
                   </tr>
                 );
               }

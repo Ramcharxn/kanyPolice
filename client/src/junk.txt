@@ -1,0 +1,481 @@
+import React, { useState, useEffect } from "react";
+import { Row, Col, Form, Table } from "react-bootstrap";
+import "./style.css";
+import { ReactComponent as Edit } from "../resource/edit.svg";
+import { ReactComponent as View } from "../resource/view.svg";
+import TableScrollbar from "react-table-scrollbar";
+import { onSnapshot, collection, collectionGroup } from "firebase/firestore";
+import db from "../firebase";
+import { useNavigate } from "react-router-dom";
+
+const MainComp = () => {
+  const [search, setSearch] = useState("");
+  const [serachBy, setSearchBy] = useState("Patient Name");
+  const [record, setRecord] = useState([]);
+  const Array = [
+    {
+      id: 1,
+      "Patient Name": "Achintya Murari L S",
+      Sex: "Female",
+      Severity: "Critical",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "9994440000",
+    },
+    {
+      id: 2,
+      "Patient Name": "Selva",
+      Sex: "Male",
+      Severity: "Normal",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "6667777880",
+    },
+    {
+      id: 3,
+      "Patient Name": "Mahidhar",
+      Sex: "Male",
+      Severity: "Dead",
+      Type_of_Medico_legal_case: "Assualt",
+      status: "Arrived",
+      "Phone number": "1112225557",
+    },
+    {
+      id: 4,
+      "Patient Name": "Ram",
+      Sex: "Male",
+      Severity: "Moderate",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Acknowledged",
+      "Phone number": "6382944040",
+    },
+    {
+      id: 5,
+      "Patient Name": "Achintya",
+      Sex: "Female",
+      Severity: "Critical",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "9994440000",
+    },
+    {
+      id: 6,
+      "Patient Name": "Selva",
+      Sex: "Male",
+      Severity: "Normal",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "6667777880",
+    },
+    {
+      id: 7,
+      "Patient Name": "Achintya",
+      Sex: "Female",
+      Severity: "Critical",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "9994440000",
+    },
+    {
+      id: 8,
+      "Patient Name": "Selva",
+      Sex: "Male",
+      Severity: "Normal",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "6667777880",
+    },
+    {
+      id: 9,
+      "Patient Name": "Ram",
+      Sex: "Male",
+      Severity: "Moderate",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Acknowledged",
+      "Phone number": "6382944040",
+    },
+    {
+      id: 10,
+      "Patient Name": "Achintya",
+      Sex: "Female",
+      Severity: "Critical",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "9994440000",
+    },
+    {
+      id: 11,
+      "Patient Name": "Selva",
+      Sex: "Male",
+      Severity: "Normal",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "6667777880",
+    },
+    {
+      id: 12,
+      "Patient Name": "Achintya",
+      Sex: "Female",
+      Severity: "Critical",
+      Type_of_Medico_legal_case: "Poison",
+      status: "Closed",
+      "Phone number": "9994440000",
+    },
+    {
+      id: 13,
+      "Patient Name": "Selva",
+      Sex: "Male",
+      Severity: "Normal",
+      Type_of_Medico_legal_case: "Accident",
+      status: "Intimated",
+      "Phone number": "6667777880",
+    },
+  ];
+
+  const patientsRef = collection(db, "patients");
+
+  const navigate = useNavigate();
+
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isActive, setIsActive] = useState(false);
+
+  const handleRowClick = (row) => {
+    setSelectedRow(selectedRow === row.id ? null : row.id);
+    setIsActive(selectedRow === row.id);
+  };
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(patientsRef, (snapshot) => {
+      setRecord(
+        snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  function circleColor(Severity) {
+    switch (Severity) {
+      case "Normal":
+        return (
+          <div
+            style={{
+              backgroundColor: "green",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      case "Moderate":
+        return (
+          <div
+            style={{
+              backgroundColor: "yellow",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      case "Critical":
+        return (
+          <div
+            style={{
+              backgroundColor: "red",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      case "Dead":
+        return (
+          <div
+            style={{
+              backgroundColor: "black",
+              width: "15px",
+              height: "15px",
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+  return (
+    <div
+      style={{ width: "100%" }}
+      className="d-flex align-items-center flex-column"
+    >
+      <Row style={{ width: "850px" }} className="mt-5 mb-3 d-flex">
+        <div
+          className="mb-2"
+          style={{
+            color: "blue",
+            fontSize: "20px",
+            fontWeight: "700",
+            fontFamily: "sans-serif",
+            letterSpacing: "1px",
+          }}
+        >
+          SIMS VADAPALANI
+        </div>
+        <hr />
+        <Row className="mt-3">
+          <Col sm="4" className="mb-3">
+            <Form.Select
+              className="me-3"
+              required
+              aria-label="Default select example"
+              name="sex"
+              onChange={(e) => setSearchBy(e.target.value)}
+            >
+              <option value="Patient Name">Name</option>
+              <option value="Severity">Severity</option>
+              <option value="status">Status</option>
+              <option value="Type_of_Medico_legal_case">Type</option>
+            </Form.Select>
+          </Col>
+          <Col sm="6" className="mb-3">
+            <Form.Control
+              placeholder="Search here...."
+              onChange={(e) => setSearch(e.target.value.toLowerCase())}
+            />
+          </Col>
+        </Row>
+      </Row>
+
+    <div class="table-wrapper">
+    <table
+          className="table-fixed"
+          bordered
+          hover
+          responsive="sm"
+          center
+        >
+          <thead>
+            <tr
+              style={{
+                height: "40px",
+                backgroundColor: "#6868ED",
+                color: "white",
+                fontSize: "12px",
+                textTransform: "uppercase",
+                letterSpacing: "2px",
+              }}
+            >
+              <th></th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                S.No
+              </th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                Name
+              </th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                Phone No
+              </th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                Type
+              </th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                Status
+              </th>
+              <th style={{ paddingLeft: "20px", paddingRight: "30px" }}></th>
+            </tr>
+          </thead>
+          <tbody style={{ backgroundColor: "#EFEFEF" }}>
+            {record.length > 0
+              ? record
+                  .filter((arr) => arr[serachBy].toLowerCase().includes(search))
+                  .map((arr, i) => {
+                    console.log(record);
+                    return (
+                      <tr
+                        // style={{ backgroundColor: getRowColor(arr.Severity) }}
+                        style={{ cursor: "pointer", height: "50px" }}
+                        
+                      >
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{circleColor(arr.Severity)}</td>
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{i + 1}</td>
+
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{arr["Patient Name"]}</td>
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{arr["Phone number"]}</td>
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{arr.Type_of_Medico_legal_case}</td>
+                        {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
+                        <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>{arr.status}</td>
+                        <td
+                      className="d-flex justify-content-between align-items-center"
+                      style={{
+                        marginTop: "10px",
+                        paddingLeft: "20px",
+                        paddingRight: "30px",
+                      }}
+                    >
+                      <div onClick={() =>
+                          navigate(`/hospital/view_report/${arr.id}`, {
+                            state: {
+                              rec: arr,
+                            },
+                          })
+                        } className="me-3">
+                        <View />
+                      </div>
+                      <div>
+                        <Edit />
+                      </div>
+                    </td>
+                      </tr>
+                    );
+                  })
+              : null}
+            {Array.filter((arr) =>
+              arr[serachBy].toLowerCase().includes(search)
+            ).map((arr, i) => {
+              return (
+                <React.Fragment key={arr.id}>
+                  <tr
+                    // style={{ backgroundColor: getRowColor(arr.Severity) }}
+                    // onClick={() => navigate(`/hospital/view_report/${i + 1}`)}
+                    onClick={() => handleRowClick(arr)}
+                    style={{ height: "50px" }}
+                  >
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {circleColor(arr.Severity)}
+                    </td>
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {i + 2}
+                    </td>
+
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {arr["Patient Name"].length > 15
+                        ? arr["Patient Name"].substring(0, 15) + "..."
+                        : arr["Patient Name"]}
+                    </td>
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {arr["Phone number"]}
+                    </td>
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {arr.Type_of_Medico_legal_case}
+                    </td>
+                    {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
+                    <td style={{ paddingLeft: "20px", paddingRight: "30px" }}>
+                      {arr.status}
+                    </td>
+                    <td
+                      className="d-flex justify-content-between align-items-center"
+                      style={{
+                        marginTop: "10px",
+                        paddingLeft: "20px",
+                        paddingRight: "30px",
+                      }}
+                    >
+                      <div className="me-3">
+                        <View />
+                      </div>
+                      <div>
+                        <Edit />
+                      </div>
+                    </td>
+                  </tr>
+                  {/* {selectedRow === arr.id && (
+                    <tr style={{ backgroundColor: "white", zIndex: -10 }}>
+                      <td colSpan={7} style={{ backgroundColor: "#0002" }}>
+                      <div
+                          style={{
+                            width: "100%",
+                            height: "200px",
+                            fontSize:'14px',
+                            textTransform:'uppercase',
+                          }}
+                          className="d-flex justify-content-center flex-column align-items-center"
+                        >
+                          
+                        </div>
+                      </td>
+                    </tr>
+                  )} */}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+        <div
+        className="d-flex justify-content-center align-items-center"
+        style={{
+          backgroundColor: "#0001",
+          borderRadius: "10px",
+          padding: "0 20px",
+          height: "40px",
+          position: "fixed",
+          bottom: "10px",
+          right: "10px",
+        }}
+      >
+        <div className="d-flex flex-row justify-content-center align-items-center">
+          <div
+            style={{
+              backgroundColor: "green",
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+            }}
+          />
+          <div style={{ color: "#0008", fontSize: "12px" }} className="me-3">
+            : Normal
+          </div>
+        </div>
+        <div className="d-flex flex-row justify-content-center align-items-center">
+          <div
+            style={{
+              backgroundColor: "yellow",
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+            }}
+          />
+          <div style={{ color: "#0008", fontSize: "12px" }} className="me-3">
+            : Moderate
+          </div>
+        </div>
+        <div className="d-flex flex-row justify-content-center align-items-center">
+          <div
+            style={{
+              backgroundColor: "red",
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+            }}
+          />
+          <div style={{ color: "#0008", fontSize: "12px" }} className="me-3">
+            : Critical
+          </div>
+        </div>
+        <div className="d-flex flex-row justify-content-center align-items-center">
+          <div
+            style={{
+              backgroundColor: "black",
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+            }}
+          />
+          <div style={{ color: "#0008", fontSize: "12px" }} className="me-3">
+            : Dead
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  )
+}
+
+export default MainComp;

@@ -1,7 +1,6 @@
 .App {
   text-align: center;
 }
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -76,4 +75,10 @@
 
 .modal-height {
   height: 70%;
+}
+
+
+@media screen and (max-width:600px) {
+  .box{
+    display:none  }
 }

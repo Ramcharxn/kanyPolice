@@ -1,0 +1,199 @@
+.image-signin {
+    background-image: url('../resource/signinBG2.jpg');
+    width:50vw;
+    height:100vh;
+    object-fit: fill;
+    background-position: left;
+}
+
+.image-signup {
+    background-image: url('../resource/signinBG.webp');
+    width:30vw;
+    height:100vh;
+    object-fit: fill;
+    background-position: left;
+}
+
+.side-text {
+    font-size: 28px;
+}
+
+.main-signin{
+    width:50vw;
+    padding: 10px;
+     height: 100vh;
+}
+
+.main-signup{
+    width:70vw;
+    padding: 10px;
+     height: 100vh;
+}
+
+.scrollable {
+    overflow-y: auto;
+    display:flex;
+    flex-direction:column;
+    align-items: center
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #9E9E9E;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+  }
+
+  .grid-container2 {
+    display: grid;
+    grid-template-columns: 3fr 3fr 3fr 1fr;
+    grid-gap: 10px;
+  }
+
+  @media screen and (max-width: 700px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+      }
+        .grid-container2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+      .image-signup{
+        width:40vw
+      }
+      .main-signup {
+        width:60vw
+      }
+  }
+  
+  .grid-item {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #6868ED;
+    color: white;
+    height:100%;
+  }
+  
+  input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+
+
+@media screen and (max-width:800px) {
+    .side-text {
+        font-size: 18px;
+    }
+    .image-signin{
+        width:40vw;
+    }
+    .main-signin{
+        width:60vw;
+    }
+}
+
+@media screen and (max-width:450px) {
+    .image-signup {
+        display: none;
+    }
+    .main-signup {
+        width:100vw
+    }
+}
+
+@media screen and (max-width:600px) {
+    .image-signin {
+        display: none;
+    }
+    .main-signin {
+        width:100vw
+    }
+}
+
+.input-box {
+    box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 8%);
+    height: 45px;
+    border: none;
+    background-color: #f3f3f3;
+    outline: none;
+    padding: 0 20px;
+    width: 300px;
+}
+
+.input-box2 {
+    box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 8%);
+    height: 45px;
+    width:100%;
+    border: none;
+    background-color: #f3f3f3;
+    outline: none;
+    padding: 0 20px;
+}
+
+.input-box3 {
+  box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 8%);
+  height: 25px;
+  width:100%;
+  border: none;
+  outline: none;
+  padding: 0 20px;
+  color:black;
+  background-color: transparent;
+}
+
+
+@media screen and (max-width:400px) {
+    .input-box {
+        width: 200px;
+
+    }
+}
+
+
+.upload-btn {
+    display:'inline-block';
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #6868ED;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+    border: 2px solid #fff;
+  }
+  
+  .upload-btn input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+  
+  .upload-btn span {
+    position: absolute;
+    width:'100%';
+    height:'100%';
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  

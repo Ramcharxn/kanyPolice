@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SideBox from "./SideBox";
 import { ReactComponent as Menu } from "../resource/menu.svg";
 import { ReactComponent as Close } from "../resource/close.svg";
@@ -6,6 +6,8 @@ import { ReactComponent as Download } from "../resource/download.svg";
 import pic from "../resource/report.jpeg";
 import { useLocation } from "react-router-dom";
 import withAuth from "../withAuth";
+import { onSnapshot, collection, query, orderBy, doc, getDocs } from "firebase/firestore";
+import db from "../firebase";
 // import FileViewer from "react-file-viewer";
 
 const ViewReport = () => {
@@ -14,6 +16,28 @@ const ViewReport = () => {
   const location = useLocation();
 
   const [record, setRecord] = useState(location.state.rec);
+
+  const userRef = collection(db, "user");
+  const [dataPol,setDataPol] = useState(null);
+  useEffect(() => {
+    const getAllDoc = async () => {
+      const querySnapshot = await getDocs(userRef);
+      // console.log(querySnapshot.docs)
+      const filteredData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+  
+      const polData = filteredData.filter(d => d.type=='police').map(item => ({ id: item.id, policeStation: item['Police station name'] }));
+
+      setDataPol(polData.reduce(function(r, e) {
+        r[e.id] = e.policeStation;
+        return r;
+      }, {}))
+    };
+
+    getAllDoc()
+  }, []);
 
   const handleClick = () => {
     setIsActive(!isActive);
@@ -486,8 +510,8 @@ const ViewReport = () => {
                   Police Station Limit
                 </div>
                 <div className="input-box2 d-flex justify-content-start align-items-center">
-                  {record["Police station limit"]
-                    ? record["Police station limit"]
+                  {record["Police station limit"] && dataPol
+                    ? dataPol[record["Police station limit"]]
                     : ""}
                 </div>
               </div>
@@ -582,4 +606,4 @@ const ViewReport = () => {
   );
 }
 
-export default withAuth(['police'])(ViewReport)
+export default withAuth(['hospital'])(ViewReport)

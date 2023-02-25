@@ -3,47 +3,78 @@ import Layout from "../component/Layout";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
 import toast from "react-hot-toast";
-import '../App.css'
+import { FieldValue } from "firebase/firestore";
+import "../App.css";
+import {
+  doc,
+  setDoc,
+  deleteDoc,
+  collection,
+  getDoc,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
+import db from "../firebase";
+
 export default function NewReport() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const patientsRef = collection(db, "patients");
 
   // var medCase = location.state.medCase;
   // var emrgCase = location.state.emrgCase;
 
   // var headingText = medCase + " " + emrgCase;
-
   const [state, setState] = useState({
     Sex: "Male",
     Relation: "Son of",
     Dying_declaration: "Dying Declaration Not required",
     Police_Info: "Police Information Given",
     Consciousness: "Conscious",
-    Type_of_Medico_legal_case: "Accident"
+    Type_of_Medico_legal_case: "Accident",
+    status: 'Intimated',
+    Severity: 'Normal',
+    date: new Date().getTime(),
+    viewed: false,
+    'Police station limit':'R-8 Police Station',
   });
 
-  const [ARPhoto, setARPhoto] = useState() 
-  const [ARPhotoType, setARPhotoType] = useState() 
-  const [ARPhotoName, setARPhotoName] = useState() 
+  const [ARPhoto, setARPhoto] = useState();
+  const [ARPhotoType, setARPhotoType] = useState();
+  const [ARPhotoName, setARPhotoName] = useState();
 
+  const [bruises, setBruises] = useState();
+  const [bruisesType, setBruisesType] = useState();
+  const [bruisesName, setBruisesName] = useState();
 
-  const [bruises, setBruises] = useState() 
-  const [bruisesType, setBruisesType] = useState() 
-  const [bruisesName, setBruisesName] = useState() 
-  
-  const [IPPhoto, setIPPhoto] = useState() 
-  const [IPPhotoType, setIPPhotoType] = useState() 
-  const [IPPhotoName, setIPPhotoName] = useState() 
-  
+  const [IPPhoto, setIPPhoto] = useState();
+  const [IPPhotoType, setIPPhotoType] = useState();
+  const [IPPhotoName, setIPPhotoName] = useState();
 
   let updateInput = (e) => {
     setState({
       ...state,
-        [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const allowed_AR_IP_files = ["image/jpeg", "image/png", "application/pdf"];
+  let updateDocument = (val, doc, type) => {
+    setState({
+      ...state,
+      [val+'doc']: doc,
+      [val+'type']: type,
+    });
+  };
+
+  const allowed_AR_IP_files = [
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ];
 
   const handleBruisesFile = (e) => {
     let selectedFile = e.target.files[0];
@@ -53,10 +84,11 @@ export default function NewReport() {
         let reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = (e) => {
-          setBruises(e.target.result);
-          setBruisesName(selectedFile.name);
-          setBruisesType(selectedFile.type);
-          console.log(e.target.result)
+          updateDocument('Bruises',e.target.result, selectedFile.type)
+          // setBruises(e.target.result);
+          // setBruisesName(selectedFile.name);
+          // setBruisesType(selectedFile.type);
+          // console.log(e.target.result);
         };
       } else {
         toast.error("Not a valid format: Please select only PDF");
@@ -75,10 +107,11 @@ export default function NewReport() {
         let reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = (e) => {
-          setIPPhoto(e.target.result);
-          setIPPhotoName(selectedFile.name);
-          setIPPhotoType(selectedFile.type);
-          console.log(e.target.result)
+          updateDocument('IP',e.target.result, selectedFile.type)
+          // setIPPhoto(e.target.result);
+          // setIPPhotoName(selectedFile.name);
+          // setIPPhotoType(selectedFile.type);
+          // console.log(e.target.result);
         };
       } else {
         toast.error("Not a valid format: Please select only png or jpeg image");
@@ -97,10 +130,11 @@ export default function NewReport() {
         let reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = (e) => {
-          setARPhoto(e.target.result);
-          setARPhotoName(selectedFile.name);
-          setARPhotoType(selectedFile.type);
-          console.log(e.target.result)
+          updateDocument('AR',e.target.result, selectedFile.type)
+          // setARPhoto(e.target.result);
+          // setARPhotoName(selectedFile.name);
+          // setARPhotoType(selectedFile.type);
+          // console.log(e.target.result);
         };
       } else {
         toast.error("Not a valid format: Please select only png or jpeg image");
@@ -111,37 +145,58 @@ export default function NewReport() {
     }
   };
 
-  const detailsSubmit = () => {
-    console.log(state)
-    console.log(bruises)
-    console.log(ARPhoto)
-    console.log(IPPhoto)
+
+  const detailsSubmit = async () => {
+
+    try {
+      // const data = Object.entries(state).reduce((acc, [key, value]) => {
+      //   acc[key] = value;
+      //   return acc;
+      // }, {});
+
+      
+        await setDoc(doc(patientsRef), 
+          state
+        );
+      } catch (err) {
+        console.log(err)
+        toast.error('An error occured, if this error presist try again later')
+      }
 
     // if(medCase == "Emergency") {
-      toast.success('Alerted respective control room')
-      toast.success('Alerted the nearest police station')
-      toast.success('Alerted SP viva SMS')
+    toast.success("Alerted respective control room");
+    toast.success("Alerted the nearest police station");
+    toast.success("Alerted SP viva SMS");
     // } else {
-      // toast.success('Alerted the nearest police station')
+    // toast.success('Alerted the nearest police station')
     // }
 
-    navigate('/hospital')
-  }
+    navigate("/hospital");
+  };
 
   return (
     <>
       <Layout heading="New Report" appBarColor="primary" />
-      <div style={{height:"50px"}} />
+      <div style={{ height: "50px" }} />
       <Container className="mt-5">
         <div className="mb-3" style={{ fontSize: "22px" }}>
           Patient Details
         </div>
         <Form.Group>
           <Row>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="3">
               <Form.Control
                 placeholder="Patient Name"
                 name="Patient Name"
+                type="text"
+                autoComplete="off"
+                onChange={updateInput}
+              />
+            </Col>
+            <Col className="mb-3" sm="3">
+              <Form.Control
+                placeholder="Phone number"
+                name="Phone number"
                 type="text"
                 autoComplete="off"
                 onChange={updateInput}
@@ -202,7 +257,7 @@ export default function NewReport() {
           <Row>
             <Col className="mb-3" sm="12">
               <Form.Control
-              className="textarea"
+                className="textarea"
                 placeholder="Address"
                 as="textarea"
                 rows="3"
@@ -298,21 +353,15 @@ export default function NewReport() {
             </Col>
           </Row>
           <Row>
-          <Col className="mb-3" sm="3">
+            <Col className="mb-3" sm="3">
               <Form.Select
                 aria-label="Default select example"
                 name="Type_of_Medico_legal_case"
                 onChange={updateInput}
               >
-              <option value="Accident">
-                Accident
-              </option>
-                <option value="Poison">
-                  Poison
-                </option>
-                <option value="Assault">
-                  Assault
-                </option>
+                <option value="Accident">Accident</option>
+                <option value="Poison">Poison</option>
+                <option value="Assault">Assault</option>
               </Form.Select>
             </Col>
             <Col className="mb-3" sm="4">
@@ -325,7 +374,7 @@ export default function NewReport() {
                 <option value="Unconscious">Unconscious</option>
               </Form.Select>
             </Col>
-            <Col className="mb-3" sm="4">
+            <Col className="mb-3" sm="5">
               <Form.Control
                 placeholder="Alleged cause of injury"
                 name="Alleged cause of injury"
@@ -361,7 +410,7 @@ export default function NewReport() {
           <Row>
             <Col className="mb-3" sm="12">
               <Form.Control
-              className="textarea"
+                className="textarea"
                 placeholder="Description of injuries and Treatment"
                 as="textarea"
                 rows="3"
@@ -375,7 +424,11 @@ export default function NewReport() {
               Photo of AR Form :
             </Form.Label>
             <Col className="mb-3" sm="10">
-              <Form.Control name="AR File" type="file" onChange={handleARFile} />
+              <Form.Control
+                name="AR File"
+                type="file"
+                onChange={handleARFile}
+              />
             </Col>
           </Row>
         </Form.Group>
@@ -415,7 +468,7 @@ export default function NewReport() {
             </Col>
           </Row>
           <Row>
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="4">
               <Form.Control
                 placeholder="Police station limit"
                 name="Police station limit"
@@ -424,13 +477,25 @@ export default function NewReport() {
               />
             </Col>
 
-            <Col className="mb-3" sm="6">
+            <Col className="mb-3" sm="4">
               <Form.Control
                 placeholder="Admitted Doctor Name"
                 name="Admitted by Doctor Name"
                 type="text"
                 onChange={updateInput}
               />
+            </Col>
+            <Col className="mb-3" sm="4">
+              <Form.Select
+                aria-label="Default select example"
+                name="Severity"
+                onChange={updateInput}
+              >
+                <option value="Normal">Normal</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Critical">Critical</option>
+                <option value="Dead">Dead</option>
+              </Form.Select>
             </Col>
           </Row>
           <Row>
@@ -462,14 +527,31 @@ export default function NewReport() {
               Photo of IP Form :
             </Form.Label>
             <Col className="mb-3" sm="10">
-              <Form.Control name="IP File" type="file" onChange={handleIPFile} />
+              <Form.Control
+                name="IP File"
+                type="file"
+                onChange={handleIPFile}
+              />
             </Col>
           </Row>
         </Form.Group>
         <div style={{ height: "20px" }} />
 
-        <Button className="me-3" style={{width:'80px'}} onClick={() => navigate('/hospital')}>Back</Button>
-        <Button style={{width:'80px'}} onClick={detailsSubmit}>Send</Button>
+        <div
+          className="d-flex justify-content-between"
+          style={{ width: "100%" }}
+        >
+          <Button
+            className="me-3"
+            style={{ width: "80px" }}
+            onClick={() => navigate("/hospital")}
+          >
+            Back
+          </Button>
+          <Button style={{ width: "80px" }} onClick={detailsSubmit}>
+            Create
+          </Button>
+        </div>
 
         <div style={{ height: "30px" }} />
       </Container>
