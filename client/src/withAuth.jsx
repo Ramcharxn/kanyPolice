@@ -21,7 +21,6 @@ const withAuth = (allowedRoles) => (WrappedComponent) => {
       // console.log('decodedtoken',decodedToken)
       const userRole = decodedToken.type;
   
-  
       if (!allowedRoles.includes(userRole)) {
         navigate('/');
         return

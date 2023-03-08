@@ -6,7 +6,7 @@ import { ReactComponent as Download } from "../resource/download.svg";
 import pic from "../resource/report.jpeg";
 import { useLocation } from "react-router-dom";
 import withAuth from "../withAuth";
-import { onSnapshot, collection, query, orderBy, doc, getDocs } from "firebase/firestore";
+import { onSnapshot, collection, query, orderBy, doc, getDocs, getDoc } from "firebase/firestore";
 import db from "../firebase";
 // import FileViewer from "react-file-viewer";
 
@@ -14,6 +14,7 @@ const ViewReport = () => {
   const [isActive, setIsActive] = useState(false);
 
   const location = useLocation();
+  const [polData,setPolData] = useState('');
 
   const [record, setRecord] = useState(location.state.rec);
 
@@ -38,6 +39,23 @@ const ViewReport = () => {
 
     getAllDoc()
   }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+        const polRef = doc(db, "user", record['Police station limit']);
+        const polSnap = await getDoc(polRef);
+
+        console.log(polSnap.data())
+    
+        if (polSnap.exists()) {
+          setPolData(polSnap.data());
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      };
+      getData()
+  },[])
 
   const handleClick = () => {
     setIsActive(!isActive);
@@ -205,6 +223,23 @@ const ViewReport = () => {
                 <div className="input-box2 d-flex justify-content-start align-items-center">
                   {record["Identification Mark 2"]
                     ? record["Identification Mark 2"]
+                    : ""}
+                </div>
+              </div>
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Active
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {record["active"]
+                    ? record["active"]
                     : ""}
                 </div>
               </div>
@@ -599,8 +634,94 @@ const ViewReport = () => {
               </div>
               <img className="image-container" src={record.IPdoc} />
             </div>
+            
+          </div>
+          <div className="view-heading">
+          <div className="heading">Police Station Information</div>
+            <div
+              class="grid-container"
+              style={{ width: "100%", padding: "20px" }}
+            >
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Police Station Name
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Police station name'] :  null }
+                </div>
+              </div>
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Station Incharge
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Police station incharge'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Incharge Phone Number
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Incharge phone number'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Area
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['area'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  City
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['city'] : null}
+                </div>
+                </div>
+                </div>
+                
           </div>
         </div>
+        
       </div>
     </div>
   );

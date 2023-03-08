@@ -25,9 +25,12 @@ import jwtDecode from "jwt-decode";
 const MainComp = () => {
   const tableRef = useRef();
   const rowRef = useRef();
+  
+  const [Data, setData] = useState([])
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
+  const [policeFilter, setPoliceFilter] = useState("All");
   const [hospitalFilter, setHospitalFilter] = useState("All");
 
   const [search, setSearch] = useState("");
@@ -40,6 +43,19 @@ const MainComp = () => {
   const [startDate, setStartDate] = useState(null);
 
   const [DToken, setDToken] = useState({});
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      setData(
+        snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const Array = [
     {
@@ -187,21 +203,6 @@ const MainComp = () => {
     },
   ];
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(userRef, (snapshot) => {
-      setData(
-        snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }))
-      );
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const [Data, setData] = useState([])
-
   const [openRow, setOpenRow] = useState(null);
   const handleClick = (index, e) => {
     setOpenRow(index === openRow ? null : index);
@@ -228,9 +229,6 @@ const MainComp = () => {
   };
 
   const handleModalOpen = async (data) => {
-    // if (modal1Show == true) {
-    //   return
-    // }
     var sound = new Audio(beep);
     console.log("added", data.id);
     sound.loop = true;
@@ -293,6 +291,7 @@ const MainComp = () => {
   //   });
   // });
   const [dataHos, setDataHos] = useState(null);
+  const [dataPol, setDataPol] = useState(null);
 
   const userRef = collection(db, "user");
 
@@ -325,6 +324,34 @@ const MainComp = () => {
   }, []);
 
   useEffect(() => {
+    const q = query(userRef, where("type", "==", "police"));
+
+    const unSubscribe = onSnapshot(
+      q,
+      { includeMetadataChanges: true },
+      (snapshot) => {
+        const filteredData = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+
+        const polData = filteredData.map((item) => ({
+          id: item.id,
+          policeStation: item["Police station name"],
+        }));
+
+        setDataPol(
+          polData.reduce(function (r, e) {
+            r[e.id] = e.policeStation;
+            return r;
+          }, {})
+        );
+      }
+    );
+    return unSubscribe;
+  }, []);
+
+  useEffect(() => {
     const q = query(patientsRef, orderBy("date", "desc"));
     const unsubscribe = onSnapshot(
       q,
@@ -346,18 +373,18 @@ const MainComp = () => {
     const decodedToken = jwtDecode(token).user;
     setDToken(decodedToken);
 
-    onSnapshot(patientsRef, { includeMetadataChanges: true }, (snapShot) => {
-      snapShot.docs.map((doc) => {
-        if (
-          !doc.data().viewed &&
-          doc.data()["Police station limit"] == decodedToken.id
-        ) {
-          console.log("inside");
-          handleModalOpen({ ...doc.data(), id: doc.id });
-          return;
-        }
-      });
-    });
+    // onSnapshot(patientsRef, { includeMetadataChanges: true }, (snapShot) => {
+    //   snapShot.docs.map((doc) => {
+    //     if (
+    //       !doc.data().viewed &&
+    //       doc.data()["Police station limit"] == decodedToken.id
+    //     ) {
+    //       console.log("inside");
+    //       handleModalOpen({ ...doc.data(), id: doc.id });
+    //       return;
+    //     }
+    //   });
+    // });
   }, []);
 
   function circleColor(Severity) {
@@ -414,6 +441,8 @@ const MainComp = () => {
         return null;
     }
   }
+
+  console.log(hospitalFilter, policeFilter)
   return (
     <div className="main-comp">
       <Row className="mt-5 mb-3 d-flex">
@@ -427,7 +456,7 @@ const MainComp = () => {
             letterSpacing: "1px",
           }}
         >
-          {DToken ? DToken["Police station name"] : "Station Name"}
+          {DToken ? DToken["Police station name"] : "Admin"}
         </div>
         <hr />
         <Row className="mt-3">
@@ -478,7 +507,7 @@ const MainComp = () => {
                 Name
               </th>
               <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                Hospital<span style={{ position:'relative'}}><DropDown />
+                Hospital Name<span style={{ position:'relative'}}><DropDown />
               <select 
                   onChange={(e) => setHospitalFilter(e.target.value)} style={{
                     cursor: "pointer",
@@ -493,30 +522,33 @@ const MainComp = () => {
                 })}
                 </select>
                 </span>
-              </th>
+                </th>
               <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                Type <span style={{ position:'relative'}}><DropDown />
+                Allocated Police<span style={{ position:'relative'}}><DropDown />
                 {/* {typeFilter == "All" ? null : `(${typeFilter})`} */}
-                <select
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  style={{
+                <select 
+                  onChange={(e) => setPoliceFilter(e.target.value)} style={{
                     cursor: "pointer",
                     position: "absolute",
                     opacity: "0",
                     left: "-10px",
                     width: "40px",
-                  }}
-                >
-                  <option value="All">All</option>
-                  <option value="Accident">Accident</option>
-                  <option value="Poison">Poison</option>
-                  <option value="Assault">Assault</option>
+                  }}>
+                <option value='All'>All</option>
+                {Data.length > 0 && Data.filter(d => d.type=='police').map(data => {  
+                    return <option value={data.id}>{data['Police station name']}</option>
+                  })}
                 </select>
-                </span>
+               
+               </span>
               </th>
-              <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                Status
-                <span style={{ position:'relative'}}><DropDown />
+              <th
+                style={{
+                  paddingLeft: "10px",
+                  paddingRight: "10px",
+                }}
+              >
+                Status <span style={{ position:'relative'}}><DropDown />
                 {/* {statusFilter == "All" ? null : `(${statusFilter})`} */}
                 <select
                   onChange={(e) => setStatusFilter(e.target.value)}
@@ -533,30 +565,28 @@ const MainComp = () => {
                   <option value="Acknowledged">Acknowledged</option>
                 </select>
                 </span>
-              </th>
+                 </th>
               <th style={{ paddingLeft: "10px", paddingRight: "10px" }}></th>
             </tr>
           </thead>
           <tbody style={{ backgroundColor: "#EFEFEF" }}>
-            {record.length > 0
+            {record.length > 0 
               ? record
                   .filter(
-                    (arr) =>
-                      arr[serachBy].toLowerCase().includes(search) &&
-                      arr["Police station limit"] == DToken["id"]
+                    (arr) => arr[serachBy].toLowerCase().includes(search)
+                    //   && arr["Police station limit"] == DToken["id"]
                   ).filter((arr) =>
-                  statusFilter !== "All" ? arr.status == statusFilter : arr
-                )
-                .filter((arr) =>
-                  typeFilter !== "All"
-                    ? arr.Type_of_Medico_legal_case == typeFilter
-                    : arr
-                )
-                .filter((arr) =>
+                  policeFilter !== "All"
+                      ? arr['Police station limit'] == policeFilter
+                      : arr
+                  )
+                  .filter((arr) =>
                   hospitalFilter !== "All"
                       ? arr['Hospital ID'] == hospitalFilter
                       : arr
-                  )
+                  ).filter((arr) =>
+                  statusFilter !== "All" ? arr.status == statusFilter : arr
+                )
                   .map((arr, i) => {
                     return (
                       <React.Fragment key={i}>
@@ -610,7 +640,11 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {arr.Type_of_Medico_legal_case}
+                            {dataPol
+                              ? dataPol[arr["Police station limit"]].length > 18
+                                ? dataPol[arr["Police station limit"]].substring(0, 18) + "..."
+                                : dataPol[arr["Police station limit"]]
+                              : null}
                           </td>
                           {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
                           <td
@@ -631,7 +665,7 @@ const MainComp = () => {
                           >
                             <div
                               onClick={() =>
-                                navigate(`/police/view_report/${arr.id}`, {
+                                navigate(`/admin/view_report/${arr.id}`, {
                                   state: {
                                     rec: arr,
                                   },
@@ -643,7 +677,6 @@ const MainComp = () => {
                             </div>
                           </td>
                         </tr>
-                       
                       </React.Fragment>
                     );
                   })
@@ -859,4 +892,4 @@ const MainComp = () => {
   );
 };
 
-export default withAuth(["police"])(MainComp);
+export default withAuth(["admin"])(MainComp);

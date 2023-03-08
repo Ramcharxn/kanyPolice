@@ -13,6 +13,8 @@ import ViewReportHos from "./hospital_new/ViewReport";
 import SignUp_H from "./component/SignUp_H";
 import SignUp_P from "./component/SignUp_P";
 import Profile from "./component/Profile";
+import Admin from "./admin/Dashboard";
+import ViewReportAdmin from "./admin/ViewReport";
 import { ReactComponent as Offline } from "./resource/offline.svg";
 
 function App() {
@@ -91,12 +93,15 @@ function App() {
         ></Route>
 
         <Route exact path="/police" element={<Police />}></Route>
-        <Route exact path="/policeh" element={<PoliceHome />}></Route>
+        {/* <Route exact path="/policeh" element={<PoliceHome />}></Route> */}
         <Route
           exact
           path="/police/view_report/:report_id"
           element={<ViewReport />}
         ></Route>
+
+        <Route exact path="/admin" element={<Admin />}></Route>
+        <Route exact path="/admin/view_report/:report_id" element={<ViewReportAdmin />}></Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

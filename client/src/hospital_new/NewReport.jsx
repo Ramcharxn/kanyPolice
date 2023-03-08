@@ -54,6 +54,7 @@ const NewReport = () => {
     Severity: "Normal",
     date: new Date().getTime(),
     viewed: false,
+    active: 'active'
   });
 
   useEffect(() => {

@@ -102,6 +102,38 @@ export default function App_pageDes({isActive, setIsActive}) {
             <div
               style={{
                 height: "50px",
+                backgroundColor: hover3 ? "#5555FA" : "#6868ED",
+                transition: "background-color 0.5s ease, transform 0.5s ease",
+                transform: hover3 ? "translateX(-20px)" : "translateX(0)",
+                paddingLeft: "75px",
+              }}
+              onMouseEnter={() => setHover3(true)}
+              onMouseLeave={() => setHover3(false)}
+              className="align-items-center d-flex"
+              onClick={() => navigate('/register-hospital')}
+            >
+              <Hospital className="me-4" />
+              Reg Hospital
+            </div>
+            <div
+              style={{
+                height: "50px",
+                backgroundColor: hover4 ? "#5555FA" : "#6868ED",
+                transition: "background-color 0.5s ease, transform 0.5s ease",
+                transform: hover4 ? "translateX(-20px)" : "translateX(0)",
+                paddingLeft: "75px",
+              }}
+              onMouseEnter={() => setHover4(true)}
+              onMouseLeave={() => setHover4(false)}
+              className="align-items-center d-flex"
+              onClick={() => navigate('/register-police')}
+            >
+              <Police className="me-4" />
+              Reg Police
+            </div>
+            <div
+              style={{
+                height: "50px",
                 backgroundColor: hover2 ? "#5555FA" : "#6868ED",
                 transition: "background-color 0.5s ease, transform 0.5s ease",
                 transform: hover2 ? "translateX(-20px)" : "translateX(0)",

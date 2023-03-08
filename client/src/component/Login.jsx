@@ -25,10 +25,10 @@ export default function Login() {
   
   useEffect(() => {
     const token = localStorage.getItem('authToken')
-    console.log(token)
     if(token != null) {
       const decodedToken = jwtDecode(token).user
-      decodedToken.type == 'hospital' ? navigate('/hospital') : navigate('/police')
+      decodedToken.type == 'hospital' ? navigate('/hospital') : decodedToken.type == 'admin' ? navigate('/admin') : navigate('/police')
+      console.log(decodedToken)
       return
     }
   },[navigate])
@@ -76,14 +76,16 @@ export default function Login() {
           // const secretKey = 'mysecretkey';
           // const token = jwt.sign({user, hashedpass}, secretKey, { expiresIn: '1d' });
           const response = await axios.post("http://localhost:5000/create-token", dict)
-          await localStorage.setItem('authToken',response.data.token)
+          localStorage.setItem('authToken',response.data.token)
             
             setInterval(console.log('in'),1000)
   
-          console.log("navigate", localStorage.getItem('authToken'), docSnap.docs[0].data().type);
+          console.log("navigate", localStorage.getItem('authToken'), docSnap);
           if (docSnap.docs[0].data().type == "police") {
             navigate("/police");
-          } else {
+          } else if (docSnap.docs[0].data().type == "admin") {
+            navigate("/admin");
+          } {
             navigate("/hospital");
           }
   

@@ -131,7 +131,7 @@ const EditReport = () => {
       }
 
       const patientsRef = doc(db, "patients", record.id);
-      await setDoc(patientsRef, record, { merge: true });
+      await updateDoc(patientsRef, record, { merge: true });
       // if(medCase == "Emergency") {
     toast.success("Alerted respective control room");
     toast.success("Alerted the nearest police station");
@@ -381,6 +381,26 @@ const EditReport = () => {
                   type="text"
                   placeholder={record['Identification Mark 2'] ? record['Identification Mark 2'] : ""}
                   name="Identification Mark 2"
+                  autoComplete="off"
+                  onChange={updateInput}
+                />
+              </div>
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Active
+                </div>
+                <input
+                  className="input-box2"
+                  type="text"
+                  placeholder={record['active'] ? record['active'] : ""}
+                  name="active"
                   autoComplete="off"
                   onChange={updateInput}
                 />

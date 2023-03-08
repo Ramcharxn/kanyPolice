@@ -1,0 +1,20 @@
+import React from 'react'
+import withAuth from '../withAuth'
+import jwtDecode from 'jwt-decode';
+import './style.css'
+import SideBox from './SideBox'
+
+function Dashboard() {
+    const token = localStorage.getItem('authToken');
+      const decodedToken = jwtDecode(token).user;
+      // console.log('decodedtoken',decodedToken)
+      const userRole = decodedToken.type;
+    console.log('from admin', userRole)
+  return (
+    <div>
+            <SideBox />
+    </div>
+  )
+}
+
+export default withAuth(['admin'])(Dashboard)

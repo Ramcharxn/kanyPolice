@@ -325,4 +325,4 @@ const SignUp = () => {
   );
 }
 
-export default withAuth(['police'])(SignUp)
+export default withAuth(['admin'])(SignUp)

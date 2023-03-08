@@ -14,14 +14,35 @@ const ViewReport = () => {
   const [isActive, setIsActive] = useState(false);
 
   const location = useLocation();
-  const [hosData,setHosData] = useState('');
 
   const [record, setRecord] = useState(location.state.rec);
 
-  const handleClick = () => {
-    setIsActive(!isActive);
-  };
+  const userRef = collection(db, "user");
+  const [dataPol,setDataPol] = useState(null);
+  const [hosData,setHosData] = useState('');
+  const [polData,setPolData] = useState('');
 
+  useEffect(() => {
+    const getAllDoc = async () => {
+      const querySnapshot = await getDocs(userRef);
+      // console.log(querySnapshot.docs)
+      const filteredData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+  
+      const polData = filteredData.filter(d => d.type=='police').map(item => ({ id: item.id, policeStation: item['Police station name'] }));
+
+      setDataPol(polData.reduce(function(r, e) {
+        r[e.id] = e.policeStation;
+        return r;
+      }, {}))
+    };
+
+    getAllDoc()
+  }, []);
+
+  
   useEffect(() => {
     const getData = async () => {
         const hosRef = doc(db, "user", record['Hospital ID']);
@@ -33,10 +54,26 @@ const ViewReport = () => {
           // doc.data() will be undefined in this case
           console.log("No such document!");
         }
+        console.log(hosSnap.data())
+
+        const polRef = doc(db, "user", record['Police station limit']);
+        const polSnap = await getDoc(polRef);
+
+        console.log(polSnap.data())
+    
+        if (polSnap.exists()) {
+          setPolData(polSnap.data());
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
       };
       getData()
   },[])
 
+  const handleClick = () => {
+    setIsActive(!isActive);
+  };
   return (
     <div className="view-report">
       {!isActive ? (
@@ -200,6 +237,23 @@ const ViewReport = () => {
                 <div className="input-box2 d-flex justify-content-start align-items-center">
                   {record["Identification Mark 2"]
                     ? record["Identification Mark 2"]
+                    : ""}
+                </div>
+              </div>
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Active
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {record["active"]
+                    ? record["active"]
                     : ""}
                 </div>
               </div>
@@ -505,8 +559,8 @@ const ViewReport = () => {
                   Police Station Limit
                 </div>
                 <div className="input-box2 d-flex justify-content-start align-items-center">
-                  {record["Police station limit"]
-                    ? record["Police station limit"]
+                  {record["Police station limit"] && dataPol
+                    ? dataPol[record["Police station limit"]]
                     : ""}
                 </div>
               </div>
@@ -595,6 +649,8 @@ const ViewReport = () => {
               <img className="image-container" src={record.IPdoc} />
             </div>
           </div>
+
+
           <div className="view-heading">
           <div className="heading">Hospital Information</div>
             <div
@@ -664,10 +720,94 @@ const ViewReport = () => {
                 </div>
                 
           </div>
+          <div className="view-heading">
+          <div className="heading">Police Station Information</div>
+            <div
+              class="grid-container"
+              style={{ width: "100%", padding: "20px" }}
+            >
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Police Station Name
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Police station name'] :  null }
+                </div>
+              </div>
+              <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Station Incharge
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Police station incharge'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Incharge Phone Number
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['Incharge phone number'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  Area
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['area'] : null}
+                </div>
+                </div>
+                <div class="grid-item">
+                <div
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: "10px",
+                    letterSpacing: "1px",
+                  }}
+                  className="mb-2"
+                >
+                  City
+                </div>
+                <div className="input-box2 d-flex justify-content-start align-items-center">
+                  {polData != '' ? polData['city'] : null}
+                </div>
+                </div>
+                </div>
+                
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default withAuth(['police'])(ViewReport)
+export default withAuth(['admin'])(ViewReport)

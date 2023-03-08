@@ -3,6 +3,7 @@ import { Row, Col, Form, Table } from "react-bootstrap";
 import "./style.css";
 import { ReactComponent as Edit } from "../resource/edit.svg";
 import { ReactComponent as View } from "../resource/view.svg";
+import { ReactComponent as DropDown } from "../resource/dropdown.svg";
 import TableScrollbar from "react-table-scrollbar";
 import {
   onSnapshot,
@@ -12,6 +13,7 @@ import {
   doc,
   getDocs,
   where,
+  updateDoc,
 } from "firebase/firestore";
 import db from "../firebase";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +24,29 @@ import { ReactComponent as Done } from "../resource/done.svg";
 const MainComp = () => {
   const [search, setSearch] = useState("");
   const [serachBy, setSearchBy] = useState("Patient Name");
+  const [severity, setSeverity] = useState("");
+  const [status, setStatus] = useState("");
+  const [active, setActive] = useState("");
+
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [policeFilter, setPoliceFilter] = useState("All");
+  
+  const [policeData, setPoliceData] = useState([])
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      setPoliceData(
+        snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const [record, setRecord] = useState([]);
   const Array = [
     {
@@ -156,6 +181,16 @@ const MainComp = () => {
     },
   ];
 
+  const handleFieldUpdate = async (arr) => {
+    const patientsRef = doc(db, "patients", arr.id);
+    setOpenRow(null);
+    await updateDoc(
+      patientsRef,
+      { Severity: severity, status: status, active: active },
+      { merge: true }
+    );
+  };
+
   const [dataPol, setDataPol] = useState(null);
 
   const userRef = collection(db, "user");
@@ -189,8 +224,11 @@ const MainComp = () => {
   }, []);
 
   const [openRow, setOpenRow] = useState(null);
-  const handleClick = (index, e) => {
+  const handleClick = (index, arr, e) => {
     setOpenRow(index === openRow ? null : index);
+    setActive(arr.active);
+    setSeverity(arr.Severity);
+    setStatus(arr.status);
   };
 
   // console.log(dataPol['ccSxD7RkWGUWqXdJbmH4'])
@@ -251,7 +289,7 @@ const MainComp = () => {
         return (
           <div
             style={{
-              backgroundColor: "green",
+              backgroundColor: "#57AC57",
               width: "15px",
               height: "15px",
               borderRadius: "50%",
@@ -303,7 +341,7 @@ const MainComp = () => {
     <div className="main-comp">
       <Row className="mt-5 mb-3 d-flex">
         <div
-          className="mb-2"
+          className="mb-2 mobile-view"
           style={{
             color: "blue",
             fontSize: "20px",
@@ -313,8 +351,8 @@ const MainComp = () => {
           }}
         >
           {DToken["Hospital name"] ? DToken["Hospital name"] : "Hospital name"}
+          <hr />
         </div>
-        <hr />
         <Row className="mt-3">
           <Col style={{ maxWidth: "200px" }} className="mb-3">
             <Form.Select
@@ -326,7 +364,6 @@ const MainComp = () => {
             >
               <option value="Patient Name">Name</option>
               <option value="Severity">Severity</option>
-              <option value="Police station limit">Reported Station</option>
               <option value="status">Status</option>
               <option value="Type_of_Medico_legal_case">Type</option>
             </Form.Select>
@@ -342,7 +379,7 @@ const MainComp = () => {
 
       <div
         class="table-wrapper"
-        style={{ width: "100%", backgroundColor: "#EFEFEF", height: "550vh" }}
+        style={{ width: "100%", backgroundColor: "#EFEFEF", height: "55vh" }}
       >
         <table className="table-fixed">
           <thead>
@@ -365,13 +402,73 @@ const MainComp = () => {
               </th>
               <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
                 Allocated Police
+                <span style={{ position:'relative'}}><DropDown />
+                <select 
+                  onChange={(e) => setPoliceFilter(e.target.value)} style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    opacity: "0",
+                    left: "-10px",
+                    width: "30px",
+                  }}>
+                <option value='All'>All</option>
+                {policeData.length > 0 && policeData.filter(d => d.type=='police').map(data => {  
+                    return <option value={data.id}>{data['Police station name']}</option>
+                  })}
+                </select>
+                </span>
               </th>
-              <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                Type
+              <th
+                style={{
+                  paddingLeft: "10px",
+                  paddingRight: "10px",
+                }}
+              >
+                Type 
+                <span style={{ position:'relative'}}><DropDown />
+                {/* {typeFilter == "All" ? null : `(${typeFilter})`} */}
+                <select
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    opacity: "0",
+                    left: "-10px",
+                    width: "40px",
+                  }}
+                >
+                  <option value="All">All</option>
+                  <option value="Accident">Accident</option>
+                  <option value="Poison">Poison</option>
+                  <option value="Assault">Assault</option>
+                </select>
+                </span>
               </th>
-              <th style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                Status
-              </th>
+              <th
+                style={{
+                  paddingLeft: "10px",
+                  paddingRight: "10px",
+                }}
+              >
+                Status 
+                <span style={{ position:'relative'}}><DropDown />
+                {/* {statusFilter == "All" ? null : `(${statusFilter})`} */}
+                <select
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  style={{
+                    cursor: "pointer",
+                    position: "absolute",
+                    opacity: "0",
+                    left: "-10px",
+                    width: "40px",
+                  }}
+                >
+                  <option value="All">All</option>
+                  <option value="Intimated">Intimated</option>
+                  <option value="Acknowledged">Acknowledged</option>
+                </select>
+                </span>
+                 </th>
               <th style={{ paddingLeft: "10px", paddingRight: "10px" }}></th>
             </tr>
           </thead>
@@ -380,16 +477,30 @@ const MainComp = () => {
               ? record
                   .filter(
                     (arr) =>
-                      arr[serachBy].toLowerCase().includes(search) &&
-                      arr["Hospital ID"] == DToken["id"]
+                        arr[serachBy].toLowerCase().includes(search) &&
+                        arr["Hospital ID"] == DToken["id"]
+                  )
+                  .filter((arr) =>
+                    statusFilter !== "All" ? arr.status == statusFilter : arr
+                  )
+                  .filter((arr) =>
+                    typeFilter !== "All"
+                      ? arr.Type_of_Medico_legal_case == typeFilter
+                      : arr
+                  )
+                  .filter((arr) =>
+                  policeFilter !== "All"
+                      ? arr['Police station limit'] == policeFilter
+                      : arr
                   )
                   .map((arr, i) => {
                     return (
                       <React.Fragment key={i}>
                         <tr
-                          onClick={(e) => handleClick(i, e)}
+                          onClick={(e) => handleClick(i, arr, e)}
                           // style={{ backgroundColor: getRowColor(arr.Severity) }}
                           className="table-row"
+                          style={openRow == i ? {backgroundColor:'#d5d5d5'} : null}
                         >
                           <td
                             style={{
@@ -413,8 +524,8 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {arr["Patient Name"].length > 15
-                              ? arr["Patient Name"].substring(0, 15) + "..."
+                            {arr["Patient Name"].length > 10
+                              ? arr["Patient Name"].substring(0, 10) + "..."
                               : arr["Patient Name"]}
                           </td>
                           <td
@@ -423,7 +534,11 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {dataPol[arr["Police station limit"]]}
+                            {dataPol
+                              ? dataPol[arr["Police station limit"]].length > 18
+                                ? dataPol[arr["Police station limit"]].substring(0, 18) + "..."
+                                : dataPol[arr["Police station limit"]]
+                              : null}
                           </td>
                           <td
                             style={{
@@ -477,78 +592,115 @@ const MainComp = () => {
                         </tr>
                         {openRow === i && (
                           <tr>
-                            <td style={{ backgroundColor: "#ddd" }} colSpan={7}>
+                            <td
+                              style={{
+                                backgroundColor: "#d5d5d5",
+                              }}
+                              colSpan={7}
+                            >
                               <div
                                 class="grid-container2"
                                 style={{ width: "100%", padding: "20px" }}
                               >
-                                <div class="grid-item">
+                                <div class="grid-item2">
                                   <div
                                     style={{
                                       textTransform: "uppercase",
-                                      fontSize: "10px",
+                                      fontSize: "12px",
                                       letterSpacing: "1px",
-                                      padding:'10px 20px',
+                                      padding: "10px 20px",
                                     }}
                                     className="d-flex justify-content-center"
                                   >
                                     Severity
                                   </div>
                                   <select
-                                    // onChange={updateInput}
-                                    name="Sex"
+                                    onChange={(e) =>
+                                      setSeverity(e.target.value)
+                                    }
+                                    name="Severity"
                                     className="input-box3"
                                   >
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="others">Others</option>
+                                    <option value={arr.Severity}>
+                                      {arr.Severity}
+                                    </option>
+                                    {[
+                                      "Moderate",
+                                      "Critical",
+                                      "Normal",
+                                      "Dead",
+                                    ].map((d) => {
+                                      return (
+                                        d !== arr.Severity && (
+                                          <option value={d}>{d}</option>
+                                        )
+                                      );
+                                    })}
                                   </select>
                                 </div>
-                                <div class="grid-item">
+                                <div class="grid-item2">
                                   <div
                                     style={{
                                       textTransform: "uppercase",
-                                      fontSize: "10px",
+                                      fontSize: "12px",
                                       letterSpacing: "1px",
-                                      padding:'10px 20px',
+                                      padding: "10px 20px",
                                     }}
                                     className="d-flex justify-content-center"
                                   >
                                     Status
                                   </div>
                                   <select
-                                    // onChange={updateInput}
-                                    name="Sex"
+                                    onChange={(e) => setStatus(e.target.value)}
+                                    name="status"
                                     className="input-box3"
                                   >
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="others">Others</option>
+                                    <option value={arr.status}>
+                                      {arr.status}
+                                    </option>
+                                    {["Intimated", "Acknowledged"].map((d) => {
+                                      return (
+                                        d !== arr.status && (
+                                          <option value={d}>{d}</option>
+                                        )
+                                      );
+                                    })}
                                   </select>
                                 </div>
-                                <div class="grid-item">
+                                <div class="grid-item2">
                                   <div
                                     style={{
                                       textTransform: "uppercase",
-                                      fontSize: "10px",
+                                      fontSize: "12px",
                                       letterSpacing: "1px",
-                                      padding:'10px 20px',
+                                      padding: "10px 20px",
                                     }}
                                     className="d-flex justify-content-center"
                                   >
                                     Active
                                   </div>
                                   <select
-                                    // onChange={updateInput}
-                                    name="Sex"
+                                    onChange={(e) => setActive(e.target.value)}
+                                    name="active"
                                     className="input-box3"
                                   >
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="others">Others</option>
+                                    <option value={arr.active}>
+                                      {arr.active}
+                                    </option>
+                                    {["Active", "Inactive"].map((d) => {
+                                      return (
+                                        d !== arr.active && (
+                                          <option value={d}>{d}</option>
+                                        )
+                                      );
+                                    })}
                                   </select>
                                 </div>
-                                <div class="grid-item" style={{width:'70px'}}>
+                                <div
+                                  onClick={() => handleFieldUpdate(arr)}
+                                  class="grid-item2"
+                                  style={{ width: "70px", cursor: "pointer" }}
+                                >
                                   <Done />
                                 </div>
                               </div>
@@ -578,7 +730,7 @@ const MainComp = () => {
             <div className="d-flex flex-row justify-content-center align-items-center">
               <div
                 style={{
-                  backgroundColor: "green",
+                  backgroundColor: "#57AC57",
                   width: "10px",
                   height: "10px",
                   borderRadius: "50%",
