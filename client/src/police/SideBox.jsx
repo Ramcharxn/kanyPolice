@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ReactComponent as New } from "../resource/new.svg";
 import { ReactComponent as Profile } from "../resource/profile.svg";
 import { ReactComponent as Dashboard } from "../resource/dashboard.svg";
-import { ReactComponent as Police } from "../resource/police.svg";
-import { ReactComponent as Hospital } from "../resource/hospital.svg";
-import { ReactComponent as Logout } from "../resource/logout.svg";
-import { ReactComponent as Next } from "../resource/next.svg";
 import { ReactComponent as Prev } from "../resource/prev.svg";
 import "./style.css";
 import { useNavigate } from "react-router-dom";

@@ -16,6 +16,7 @@ import Profile from "./component/Profile";
 import Admin from "./admin/Dashboard";
 import ViewReportAdmin from "./admin/ViewReport";
 import { ReactComponent as Offline } from "./resource/offline.svg";
+import ManageUser from "./admin/ManageUser";
 
 function App() {
   const [isOnline, setIsOnline] = useState(true);
@@ -101,7 +102,8 @@ function App() {
         ></Route>
 
         <Route exact path="/admin" element={<Admin />}></Route>
-        <Route exact path="/admin/view_report/:report_id" element={<ViewReportAdmin />}></Route>
+        <Route exact path="/Manage-user" element={<ManageUser />}></Route
+        ><Route exact path="/admin/view_report/:report_id" element={<ViewReportAdmin />}></Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

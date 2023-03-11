@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import { ReactComponent as New } from "../resource/new.svg";
 import { ReactComponent as Profile } from "../resource/profile.svg";
 import { ReactComponent as Dashboard } from "../resource/dashboard.svg";
-import { ReactComponent as Close } from "../resource/close.svg";
-import { ReactComponent as Logout } from "../resource/logout.svg";
-import { ReactComponent as Next } from "../resource/next.svg";
 import { ReactComponent as Prev } from "../resource/prev.svg";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -130,21 +127,7 @@ export default function App_pageDes({isActive, setIsActive}) {
               <Profile className="me-4" />
               profile
             </div>
-            {/* <div
-              style={{
-                height: "50px",
-                backgroundColor: hover3 ? "#5555FA" : "#6868ED",
-                transition: "background-color 0.5s ease, transform 0.5s ease",
-                transform: hover3 ? "translateX(-20px)" : "translateX(0)",
-                paddingLeft: "75px",
-              }}
-              onMouseEnter={() => setHover3(true)}
-              onMouseLeave={() => setHover3(false)}
-              className="align-items-center d-flex"
-            >
-              <Logout className="me-4" />
-              logout
-            </div> */}
+           
           </div>
         </div>
       </div>

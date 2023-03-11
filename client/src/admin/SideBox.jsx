@@ -4,8 +4,7 @@ import { ReactComponent as Profile } from "../resource/profile.svg";
 import { ReactComponent as Dashboard } from "../resource/dashboard.svg";
 import { ReactComponent as Police } from "../resource/police.svg";
 import { ReactComponent as Hospital } from "../resource/hospital.svg";
-import { ReactComponent as Logout } from "../resource/logout.svg";
-import { ReactComponent as Next } from "../resource/next.svg";
+import { ReactComponent as ManageUser } from "../resource/user-manage.svg";
 import { ReactComponent as Prev } from "../resource/prev.svg";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +15,7 @@ export default function App_pageDes({isActive, setIsActive}) {
   const [hover2, setHover2] = useState(false);
   const [hover3, setHover3] = useState(false);
   const [hover4, setHover4] = useState(false);
+  const [hover5, setHover5] = useState(false);
   const [viewSide, setViewSide] = useState(true);
   const navigate = useNavigate()
   const [DToken, setDToken] = useState({})
@@ -134,6 +134,22 @@ export default function App_pageDes({isActive, setIsActive}) {
             <div
               style={{
                 height: "50px",
+                backgroundColor: hover5 ? "#5555FA" : "#6868ED",
+                transition: "background-color 0.5s ease, transform 0.5s ease",
+                transform: hover5 ? "translateX(-20px)" : "translateX(0)",
+                paddingLeft: "75px",
+              }}
+              onMouseEnter={() => setHover5(true)}
+              onMouseLeave={() => setHover5(false)}
+              className="align-items-center d-flex"
+              onClick={() => navigate('/Manage-user')}
+            >
+              <ManageUser className="me-4" />
+              Manage User
+            </div>
+            <div
+              style={{
+                height: "50px",
                 backgroundColor: hover2 ? "#5555FA" : "#6868ED",
                 transition: "background-color 0.5s ease, transform 0.5s ease",
                 transform: hover2 ? "translateX(-20px)" : "translateX(0)",
@@ -147,21 +163,7 @@ export default function App_pageDes({isActive, setIsActive}) {
               <Profile className="me-4" />
               profile
             </div>
-            {/* <div
-              style={{
-                height: "50px",
-                backgroundColor: hover3 ? "#5555FA" : "#6868ED",
-                transition: "background-color 0.5s ease, transform 0.5s ease",
-                transform: hover3 ? "translateX(-20px)" : "translateX(0)",
-                paddingLeft: "75px",
-              }}
-              onMouseEnter={() => setHover3(true)}
-              onMouseLeave={() => setHover3(false)}
-              className="align-items-center d-flex"
-            >
-              <Logout className="me-4" />
-              logout
-            </div> */}
+            
           </div>
         </div>
       </div>
