@@ -534,11 +534,12 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {dataPol
+                          {dataPol[arr["Police station limit"]] != undefined ? dataPol
                               ? dataPol[arr["Police station limit"]].length > 18
                                 ? dataPol[arr["Police station limit"]].substring(0, 18) + "..."
                                 : dataPol[arr["Police station limit"]]
-                              : null}
+                              : null
+                              : 'User Deleted'}
                           </td>
                           <td
                             style={{

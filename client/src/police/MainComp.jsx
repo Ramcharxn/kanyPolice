@@ -598,11 +598,12 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {dataHos
+                          {dataHos[arr["Hospital ID"]] != undefined ? dataHos
                               ? dataHos[arr["Hospital ID"]].length > 18
                                 ? dataHos[arr["Hospital ID"]].substring(0, 18) + "..."
                                 : dataHos[arr["Hospital ID"]]
-                              : null}
+                              : null
+                              : 'User Deleted'}
                           </td>
                           <td
                             style={{

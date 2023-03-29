@@ -570,7 +570,7 @@ const MainComp = () => {
             </tr>
           </thead>
           <tbody style={{ backgroundColor: "#EFEFEF" }}>
-            {record.length > 0 
+            {record && record.length > 0 
               ? record
                   .filter(
                     (arr) => arr[serachBy].toLowerCase().includes(search)
@@ -589,6 +589,8 @@ const MainComp = () => {
                 )
                   .map((arr, i) => {
                     return (
+
+                      
                       <React.Fragment key={i}>
                         <tr
                           ref={rowRef}
@@ -628,11 +630,12 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {dataHos
+                            {dataHos[arr["Hospital ID"]] != undefined ? dataHos
                               ? dataHos[arr["Hospital ID"]].length > 18
                                 ? dataHos[arr["Hospital ID"]].substring(0, 18) + "..."
                                 : dataHos[arr["Hospital ID"]]
-                              : null}
+                              : null
+                              : 'User Deleted'}
                           </td>
                           <td
                             style={{
@@ -640,11 +643,13 @@ const MainComp = () => {
                               paddingRight: "10px",
                             }}
                           >
-                            {dataPol
+                            {/* {dataPol && dataPol[arr["Police station limit"]] == undefined ? console.log(dataPol) : null} */}
+                            {dataPol[arr["Police station limit"]] != undefined ? dataPol
                               ? dataPol[arr["Police station limit"]].length > 18
                                 ? dataPol[arr["Police station limit"]].substring(0, 18) + "..."
                                 : dataPol[arr["Police station limit"]]
-                              : null}
+                              : null
+                            : 'User Deleted'}
                           </td>
                           {/* <td>{arr.Status == "Arrived" ? <CheckBox/> : null}</td> */}
                           <td
