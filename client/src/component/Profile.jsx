@@ -131,7 +131,7 @@ const Profile = () => {
           'id':DToken['id']
         }
 
-        const response = await axios.post("http://localhost:5000/create-token", DToken.type == 'police' ? policedata : DToken.type == 'hospital' ? hospitalData : adminData,)
+        const response = await axios.post("https://kanya-project-server.onrender.com/create-token", DToken.type == 'police' ? policedata : DToken.type == 'hospital' ? hospitalData : adminData,)
         localStorage.setItem('authToken',response.data.token)
         const userRef = doc(db, "user", DToken.id);
   

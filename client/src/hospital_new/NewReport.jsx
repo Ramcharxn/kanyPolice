@@ -184,7 +184,7 @@ const NewReport = () => {
       console.log('clicked')
 
       if (state.Severity == 'Critical') {
-        axios.post('http://localhost:5000/send-sms',{patName: state['Patient Name'], Severity: state['Severity'], hospName: DToken['Hospital name']}).then(res => toast.success('Alerted SP via SMS')).catch(err => (console.log(err), toast.error('Error occured when sending SMS to SP')))
+        axios.post('https://kanya-project-server.onrender.com/send-sms',{patName: state['Patient Name'], Severity: state['Severity'], hospName: DToken['Hospital name']}).then(res => toast.success('Alerted SP via SMS')).catch(err => (console.log(err), toast.error('Error occured when sending SMS to SP')))
       }
       console.log('clicked2')
 

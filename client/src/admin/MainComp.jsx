@@ -272,6 +272,8 @@ const MainComp = () => {
 
   const patientsRef = collection(db, "patients");
 
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate();
 
   // const [selectedRow, setSelectedRow] = useState(null);
@@ -296,6 +298,7 @@ const MainComp = () => {
   const userRef = collection(db, "user");
 
   useEffect(() => {
+    setLoading(true)
     const q = query(userRef, where("type", "==", "hospital"));
     const unSubscribe = onSnapshot(
       q,
@@ -318,12 +321,14 @@ const MainComp = () => {
           }, {})
         );
 
+        setLoading(false)
         return unSubscribe;
       }
     );
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     const q = query(userRef, where("type", "==", "police"));
 
     const unSubscribe = onSnapshot(
@@ -348,10 +353,12 @@ const MainComp = () => {
         );
       }
     );
+    setLoading(false)
     return unSubscribe;
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     const q = query(patientsRef, orderBy("date", "desc"));
     const unsubscribe = onSnapshot(
       q,
@@ -365,6 +372,7 @@ const MainComp = () => {
         );
       }
     );
+    setLoading(false)
     return () => unsubscribe();
   }, []);
 
@@ -445,7 +453,8 @@ const MainComp = () => {
   console.log(hospitalFilter, policeFilter)
   return (
     <div className="main-comp">
-      <Row className="mt-5 mb-3 d-flex">
+      {loading ? <div style={{position:'fixed', backgroundColor:'#ddd', borderRadius:'5px', top:'40px', width:'200px', height:'40px', display:'flex', justifyContent:'center', alignItems:'center', left:'50%', transform:'translateX(-50%)'}}>Loading Please wait...</div> : null}
+     <Row className="mt-5 mb-3 d-flex">
         <div
           className="mb-2"
           style={{

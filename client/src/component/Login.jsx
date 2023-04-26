@@ -55,8 +55,11 @@ export default function Login() {
 
   const userRef = collection(db, "user");
 
+  const [loading, setLoading] = useState(false)
+
   const validateData = async (e) => {
     e.preventDefault();
+    setLoading(true)
     // const docRef = doc(db, "user", 'unq id' == user);
     const q = query(userRef, where("unq id", "==", user));
     // const docRef = doc(q);
@@ -75,7 +78,7 @@ export default function Login() {
 
           // const secretKey = 'mysecretkey';
           // const token = jwt.sign({user, hashedpass}, secretKey, { expiresIn: '1d' });
-          const response = await axios.post("http://localhost:5000/create-token", dict)
+          const response = await axios.post("https://kanya-project-server.onrender.com/create-token", dict)
           localStorage.setItem('authToken',response.data.token)
             
             setInterval(console.log('in'),1000)
@@ -96,15 +99,18 @@ export default function Login() {
         }
         
       } catch (err) {
+        console.log(err)
         toast.error("Check your user id and password");
       }
     } else {
       toast.error("Check your user id and password");
     }
+    setLoading(false)
   };
 
   return (
     <div className="d-flex">
+      {loading ? <div style={{position:'fixed', backgroundColor:'#ddd', borderRadius:'5px', top:'40px', width:'200px', height:'40px', display:'flex', justifyContent:'center', alignItems:'center', left:'50%', transform:'translateX(-50%)'}}>Loading Please wait...</div> : null}
       <div className="image-signin">
         <div
           style={{

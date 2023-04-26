@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { toast } from "react-hot-toast";
 import bcrypt from 'bcryptjs'
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs } from "firebase/firestore";
 import db from "../firebase";
 import { useNavigate } from "react-router-dom";
 import withAuth from "../withAuth";
@@ -21,6 +21,31 @@ const SignUp = () => {
   // const policeRef = collection(db, "police");
   const userRef = collection(db, "user");
 
+  const [unqid, setUnqid] = useState(0)
+
+  const getAllDoc = async () => {
+    const querySnapshot = await getDocs(userRef);
+    // console.log(querySnapshot.docs)
+    const filteredData = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+  //   var unqID = (Math.floor(Math.random()*90000) + 10000)
+  // console.log((filteredData.filter(data => data['unq id'] == unqID).length == 0))
+
+    while(true) {
+      var unqID = (Math.floor(Math.random()*90000) + 10000)
+      if ((filteredData.filter(data => data['unq id'] == unqID).length == 0)) {
+        setUnqid(unqID)
+        break
+      }
+      console.log('trying')
+    }
+  };
+
+  getAllDoc()
+
   const validateData = async(e) => {
     e.preventDefault()
 
@@ -39,7 +64,7 @@ const SignUp = () => {
 
       await setDoc(doc(userRef), {
         'Police station name': name,
-        'unq id': id,
+        'unq id': unqid,
         'Police station incharge': incharge,
         'Incharge phone number': phoneNum,
         'password': hashedPassword,
@@ -156,27 +181,7 @@ const SignUp = () => {
                   onChange={e => setName(e.target.value)}
                 />
               </div>
-              <div class="grid-item">
-                <div
-                  style={{
-                    textTransform: "uppercase",
-                    fontSize: "10px",
-                    letterSpacing: "1px",
-                  }}
-                  className="mb-2"
-                >
-                  Police Station ID *
-                </div>
-                <input
-                  className="input-box2"
-                  type="number"
-                  required
-                  name='station id'
-                  placeholder="12345"
-                  value={id}
-                  onChange={e => setID(e.target.value)}
-                />
-              </div>
+              
               <div class="grid-item">
                 <div
                   style={{

@@ -187,6 +187,9 @@ const MainComp = () => {
     },
   ];
 
+  
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
       setData(
@@ -257,16 +260,16 @@ const MainComp = () => {
     setAudio(null);
   };
 
-  const closeModal = () => {
-    audio.pause();
+  const closeModal = async() => {
+    await audio.pause();
     setModal1Show(false);
     setAudio(null);
     console.log("inside close");
     setNewReport(null);
   };
 
-  const pauseAudio = () => {
-    audio.pause();
+  const pauseAudio = async() => {
+    await audio.pause();
     setAudio(null);
     setNewReport(null);
     console.log("inside pause");
@@ -297,6 +300,7 @@ const MainComp = () => {
   const userRef = collection(db, "user");
 
   useEffect(() => {
+    setLoading(true)
     const q = query(userRef, where("type", "==", "hospital"));
     const unSubscribe = onSnapshot(
       q,
@@ -319,12 +323,14 @@ const MainComp = () => {
           }, {})
         );
 
+        setLoading(false)
         return unSubscribe;
       }
     );
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     const q = query(patientsRef, orderBy("date", "desc"));
     const unsubscribe = onSnapshot(
       q,
@@ -338,11 +344,12 @@ const MainComp = () => {
         );
       }
     );
+    setLoading(false)
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken")
     const decodedToken = jwtDecode(token).user;
     setDToken(decodedToken);
 
@@ -416,6 +423,7 @@ const MainComp = () => {
   }
   return (
     <div className="main-comp">
+      {loading ? <div style={{position:'fixed', backgroundColor:'#ddd', borderRadius:'5px', top:'40px', width:'200px', height:'40px', display:'flex', justifyContent:'center', alignItems:'center', left:'50%', transform:'translateX(-50%)'}}>Loading Please wait...</div> : null}
       <Row className="mt-5 mb-3 d-flex">
         <div
           className="mb-2"
@@ -630,6 +638,7 @@ const MainComp = () => {
                               paddingRight: "30px",
                             }}
                           >
+
                             <div
                               onClick={() =>
                                 navigate(`/police/view_report/${arr.id}`, {
@@ -803,25 +812,21 @@ const MainComp = () => {
                   }}
                 >
                   <div className="content-modal">Hospital Name</div>
-                  <div className="content-modal">Hospital Phone Number</div>
                   <div className="content-modal">Patient Name</div>
                   <div className="content-modal">Patient Phone Number</div>
                   <div className="content-modal">Type of medico case</div>
                   <div className="content-modal">Case severity</div>
-                  <div className="content-modal">Area</div>
-                  <div className="content-modal">City</div>
-                  <div className="content-modal">Pin Code</div>
                 </div>
                 <div
                   className="d-flex flex-column"
                   style={{ textTransform: "capitalize" }}
                 >
                   <div className="content-modal">
-                    : {newReport["Hospital Name"]}
+                    : {dataHos !== null ? dataHos[newReport["Hospital ID"]] : null}
                   </div>
-                  <div className="content-modal">
-                    : {newReport["Hospital Number"]}
-                  </div>
+                  {/* <div className="content-modal">
+                    : {DToken["Hospital Number"]}
+                  </div> */}
                   <div className="content-modal">
                     : {newReport["Patient Name"]}
                   </div>
@@ -832,11 +837,6 @@ const MainComp = () => {
                     : {newReport["Type_of_Medico_legal_case"]}
                   </div>
                   <div className="content-modal">: {newReport["Severity"]}</div>
-                  <div className="content-modal">
-                    : 97. Street Name, Area Name
-                  </div>
-                  <div className="content-modal">: Chennai</div>
-                  <div className="content-modal">: 600091</div>
                 </div>
               </>
             ) : (
@@ -845,15 +845,23 @@ const MainComp = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
+        {newReport != null ? (
           <Button
             className="btn bg-transparent "
             variant="none"
-            onClick={() => (navigate(`/police/view_report/${1}`), pauseAudio())}
+            onClick={() => (pauseAudio(),
+              navigate(`/police/view_report/${newReport.id}`, {
+                state: {
+                  rec: newReport,
+                },
+              }))
+            }
           >
             <div style={{ color: "black", fontSize: 14 }}>
               View <Next />
             </div>
           </Button>
+        ):null}
         </Modal.Footer>
       </Modal>
     </div>

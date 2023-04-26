@@ -5,6 +5,7 @@ import { ReactComponent as Edit } from "../resource/edit.svg";
 import { ReactComponent as View } from "../resource/view.svg";
 import { ReactComponent as DropDown } from "../resource/dropdown.svg";
 import TableScrollbar from "react-table-scrollbar";
+
 import {
   onSnapshot,
   collection,
@@ -20,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import withAuth from "../withAuth";
 import jwtDecode from "jwt-decode";
 import { ReactComponent as Done } from "../resource/done.svg";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const MainComp = () => {
   const [search, setSearch] = useState("");
@@ -184,6 +187,12 @@ const MainComp = () => {
   const handleFieldUpdate = async (arr) => {
     const patientsRef = doc(db, "patients", arr.id);
     setOpenRow(null);
+
+    console.log(severity, arr)
+
+    if (severity == 'Critical') {
+      axios.post('https://kanya-project-server.onrender.com/send-sms',{patName: arr['Patient Name'], Severity: 'Critical', hospName: DToken['Hospital name']}).then(res => toast.success('Alerted SP via SMS')).catch(err => (console.log(err), toast.error('Error occured when sending SMS to SP')))
+    }
     await updateDoc(
       patientsRef,
       { Severity: severity, status: status, active: active },
@@ -195,7 +204,10 @@ const MainComp = () => {
 
   const userRef = collection(db, "user");
 
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
+    setLoading(true)
     const q = query(userRef, where("type", "==", "police"));
 
     const unSubscribe = onSnapshot(
@@ -220,6 +232,7 @@ const MainComp = () => {
         );
       }
     );
+    setLoading(false)
     return unSubscribe;
   }, []);
 
@@ -266,6 +279,7 @@ const MainComp = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     const q = query(patientsRef, orderBy("date", "desc"));
     const unsubscribe = onSnapshot(
       q,
@@ -280,6 +294,7 @@ const MainComp = () => {
       }
     );
 
+    setLoading(false)
     return () => unsubscribe();
   }, []);
 
@@ -339,7 +354,8 @@ const MainComp = () => {
   }
   return (
     <div className="main-comp">
-      <Row className="mt-5 mb-3 d-flex">
+     {loading ? <div style={{position:'fixed', backgroundColor:'#ddd', borderRadius:'5px', top:'40px', width:'200px', height:'40px', display:'flex', justifyContent:'center', alignItems:'center', left:'50%', transform:'translateX(-50%)'}}>Loading Please wait...</div> : null}
+       <Row className="mt-5 mb-3 d-flex">
         <div
           className="mb-2 mobile-view"
           style={{
@@ -493,6 +509,7 @@ const MainComp = () => {
                       ? arr['Police station limit'] == policeFilter
                       : arr
                   )
+                
                   .map((arr, i) => {
                     return (
                       <React.Fragment key={i}>
